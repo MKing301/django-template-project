@@ -1,0 +1,6 @@
+Django
+django-extensions
+django-recaptcha
+django-widget-tweaks
+psycopg2-binary
+python-dotenv
