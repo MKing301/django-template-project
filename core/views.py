@@ -2,6 +2,7 @@ import os
 
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.http import HttpResponse
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import PasswordChangeView, logout_then_login
 from django.contrib.auth import (
@@ -131,6 +132,15 @@ def login_request(request):
             another user.'''
         )
         return redirect("core:index")
+
+
+def check_username(request):
+    username = request.POST.get('username')
+    try:
+        user = User.objects.get(username=username)
+        return HttpResponse('<div id="username-error" class="error">This username already exists!</div>')
+    except User.DoesNotExist:
+        return HttpResponse('<div id="username-error" class="success">This username is available.</div>')
 
 
 def register(request):
