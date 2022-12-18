@@ -56,3 +56,9 @@ urlpatterns = [
         name='password_reset_complete'),
     path("contact/", views.contact, name='contact'),
 ]
+
+htmx_urlpatterns = [
+    path('register/check_username/', views.check_username, name='check_username'),
+]
+
+urlpatterns += htmx_urlpatterns
