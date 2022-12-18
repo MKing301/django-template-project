@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -33,10 +34,13 @@
 
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/core_styles.css' %}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'core/css/core_styles.css' %}">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 
   <title>
     {% block title %} Home {% endblock %}
