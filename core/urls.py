@@ -58,7 +58,9 @@ urlpatterns = [
 ]
 
 htmx_urlpatterns = [
-    path('register/check_username/', views.check_username, name='check_username'),
+    path(
+        'register/check_username/', views.check_username, name='check_username'
+        ),
 ]
 
 urlpatterns += htmx_urlpatterns
