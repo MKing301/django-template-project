@@ -39,7 +39,7 @@
                 required=true
                 hx-post="check_username/"
                 hx-swap="outerhtml"
-                hx-trigger="keyup delay:2s"
+                hx-trigger="keyup delay:1s"
                 hx-target="#username-error"
             >
             <p class="field_note">
@@ -50,8 +50,19 @@
             <br>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="text" class="form-control" name="email" required=true>
+            <input
+                type="text"
+                class="form-control"
+                name="email"
+                id="email"
+                required=true
+                hx-post="check_email/"
+                hx-swap="outerhtml"
+                hx-trigger="keyup delay:1s"
+                hx-target="#email-error"
+            >
         </div>
+        <div id="email-error"></div>
         <div class="form-group">
             <label for="password1">Password</label>
             <input
