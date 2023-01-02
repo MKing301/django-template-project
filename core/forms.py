@@ -36,6 +36,7 @@ class NewUserForm(UserCreationForm):
     def save(self, commit=True):
         user = super(NewUserForm, self).save(commit=False)
         user.email = self.cleaned_data['email']
+        user.is_active = False # REMOVE LINE TO ALLOW USERS AUTO ACCESS TO APP
         if commit:
             user.save()
             return user
