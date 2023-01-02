@@ -1,7 +1,6 @@
 import os
 
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import PasswordChangeView, logout_then_login
@@ -10,6 +9,7 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from .models import User
 from .forms import (
     AuthenticationFormWithCaptchaField,
     NewUserForm,
