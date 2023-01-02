@@ -2,8 +2,7 @@ from django import forms
 from django.contrib.auth.forms import (
     AuthenticationForm, UserCreationForm, UserChangeForm
 )
-from django.contrib.auth.models import User
-from .models import Contact
+from .models import Contact, User
 from django.core.exceptions import ValidationError
 from captcha.fields import ReCaptchaField
 
