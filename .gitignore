@@ -90,3 +90,6 @@ db.sqlite3
 venv/
 env/
 .env
+
+# VS Code
+.vscode/
