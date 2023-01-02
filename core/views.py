@@ -143,6 +143,15 @@ def check_username(request):
         return HttpResponse('<div id="username-error" class="success">This username is available.</div>')
 
 
+def check_email(request):
+    email = request.POST.get('email')
+    try:
+        user = User.objects.get(email=email)
+        return HttpResponse('<div id="email-error" class="error">This email already exists!</div>')
+    except User.DoesNotExist:
+        return HttpResponse('<div id="email-error" class="success">This email is available.</div>')
+
+
 def register(request):
     if not request.user.is_authenticated:
         if request.method == "POST":
