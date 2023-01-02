@@ -163,7 +163,9 @@ def register(request):
                 username = form.cleaned_data.get("username")
                 email = form.cleaned_data.get("email")
                 password = form.cleaned_data.get("password1")
-                user = authenticate(username=username, password=password)
+
+                # START AUTOMATICALLY ALLOW USERS TO ACCESS APP
+                ''' user = authenticate(username=username, password=password)
                 login(request, user)
                 messages.success(
                     request,
@@ -172,10 +174,21 @@ def register(request):
                 messages.success(
                     request,
                     f"Successfully logged in as {username}."
-                )
+                ) '''
+                # END AUTOMATICALLY ALLOW USERS TO ACCESS APP
 
-                subject, from_email, to = 'New User Registered for core App', os.environ.get(
-                    'MAIL_USERNAME'), os.environ.get('MAIL_RECIPIENTS')
+                # START USER ACTIVE SET TO FALSE BY DEFAULT
+                messages.info(
+                    request,
+                    f"Email sent to Admin to activate your account."
+                )
+                # END USER ACTIVE SET TO FALSE BY DEFAULT
+
+                subject, from_email, to = (
+                    'New User Registered for core App',
+                    os.environ.get('MAIL_USERNAME'),
+                    os.environ.get('MAIL_RECIPIENTS')
+                )
                 text_content = f'''
                 New User ...
 
