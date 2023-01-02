@@ -1,6 +1,27 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+
+
+class User(AbstractUser):
+    class Role(models.TextChoices):
+        ADMIN = ('ADMIN', 'Admin')
+        LEADER = ('LEADER', 'Leader')
+        MEMBER = ('MEMBER', 'Member')
+        GUEST = ('GUEST', 'Guest')
+
+    role = models.CharField(
+        name='Role',
+        max_length=50,
+        choices=Role.choices,
+        null=True,
+        blank=True
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.is_active = True
+            return super().save(*args, **kwargs)
 
 
 class Contact(models.Model):
