@@ -18,11 +18,6 @@ class User(AbstractUser):
         blank=True
     )
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.is_active = True
-            return super().save(*args, **kwargs)
-
 
 class Contact(models.Model):
     fullname = models.CharField(max_length=75)
