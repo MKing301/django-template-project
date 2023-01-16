@@ -5,6 +5,7 @@ from django.contrib.auth.forms import (
 from .models import Contact, User
 from django.core.exceptions import ValidationError
 from captcha.fields import ReCaptchaField
+from core.tasks import send_registration_email_task
 
 
 class AuthenticationFormWithCaptchaField(AuthenticationForm):
@@ -30,6 +31,14 @@ class NewUserForm(UserCreationForm):
             "email",
             "password1",
             "password2"
+        )
+
+    def send_registration_email(self):
+        send_registration_email_task.delay(
+            self.cleaned_data['first_name'],
+            self.cleaned_data['last_name'],
+            self.cleaned_data['username'],
+            self.cleaned_data['email']
         )
 
     def save(self, commit=True):
