@@ -167,6 +167,7 @@ def register(request):
                 # START AUTOMATICALLY ALLOW USERS TO ACCESS APP
                 ''' user = authenticate(username=username, password=password)
                 login(request, user)
+                form.send_registration_email()
                 messages.success(
                     request,
                     f"New account created for {username}."
@@ -178,40 +179,12 @@ def register(request):
                 # END AUTOMATICALLY ALLOW USERS TO ACCESS APP
 
                 # START USER ACTIVE SET TO FALSE BY DEFAULT
+                form.send_registration_email()
                 messages.info(
                     request,
                     f"Email sent to Admin to activate your account."
                 )
                 # END USER ACTIVE SET TO FALSE BY DEFAULT
-
-                subject, from_email, to = (
-                    'New User Registered for core App',
-                    os.environ.get('MAIL_USERNAME'),
-                    os.environ.get('MAIL_RECIPIENTS')
-                )
-                text_content = f'''
-                New User ...
-
-                First Name: {first_name}\n
-                Last Name: {last_name}\n
-                Username: {username}\n
-                Email: {email}\n
-                '''
-                html_content = f'''
-                <p>Greetings!</p>
-                <p>The following user registered:</p>
-                <ul>
-                <li><strong>First Name:</strong> {first_name}</li>
-                <li><strong>Last Name:</strong> {last_name}</li>
-                <li><strong>Username:</strong> {username}</li>
-                <li><strong>Email:</strong> {email}</li>
-                </ul>
-                '''
-                msg = EmailMultiAlternatives(
-                    subject, text_content, from_email, [to]
-                )
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
                 return redirect("core:entry")
             else:
                 return render(
