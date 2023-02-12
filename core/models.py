@@ -3,28 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 
 
-class User(AbstractUser):
-    class Role(models.TextChoices):
-        ADMIN = ('ADMIN', 'Admin')
-        LEADER = ('LEADER', 'Leader')
-        MEMBER = ('MEMBER', 'Member')
-        GUEST = ('GUEST', 'Guest')
-
-    role = models.CharField(
-        name='Role',
-        max_length=50,
-        choices=Role.choices,
-        null=True,
-        blank=True
-    )
-
-    class Meta:
-        verbose_name_plural = "Users"
-
-    def __str__(self):
-        return self.first_name + ' ' + self.last_name
-
-
 class Usa_State(models.Model):
     name = models.CharField(max_length=75)
 
@@ -48,22 +26,6 @@ class City(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Contact(models.Model):
-    fullname = models.CharField(max_length=75)
-    contact_email = models.EmailField()
-    contact_subject = models.CharField(max_length=50)
-    contact_message = models.TextField()
-    inserted_date = models.DateTimeField(
-        default=timezone.now
-    )
-
-    class Meta:
-        verbose_name_plural = "Catalog_Contacts"
-
-    def __str__(self):
-        return self.fullname
 
 
 class Org(models.Model):
@@ -102,6 +64,11 @@ class Ministry(models.Model):
 
 class MinistryRole(models.Model):
     name = models.CharField(max_length=150)
+    ministry_department = models.ForeignKey(
+        Ministry,
+        verbose_name="Ministries",
+        default=None,
+        on_delete=models.CASCADE)
 
     class Meta:
         verbose_name_plural = "MinistryRoles"
@@ -110,45 +77,35 @@ class MinistryRole(models.Model):
         return self.name
 
 
-class MinistryTeamMember(models.Model):
-    team_member = models.ForeignKey(
-        User,
-        verbose_name="Users",
-        on_delete=models.CASCADE)
-    ministry_department = models.ForeignKey(
-        Ministry,
-        verbose_name="Ministries",
-        on_delete=models.CASCADE)
-    team_role = models.ForeignKey(
-        MinistryRole,
-        verbose_name="MinistryRoles",
-        on_delete=models.CASCADE)
+class User(AbstractUser):
 
-    class Meta:
-        verbose_name_plural = "MinistryTeamMembers"
+    class Role(models.TextChoices):
+        ADMIN = ('ADMIN', 'Admin')
+        LEADER = ('LEADER', 'Leader')
+        MEMBER = ('MEMBER', 'Member')
+        GUEST = ('GUEST', 'Guest')
 
-    def __str__(self):
-        return self.team_member.first_name + ' ' + self.team_member.last_name + ' ' + self.team_role.name + ' ' + self.ministry_department.name
-
-
-class UserDetail(models.Model):
     class Gender(models.TextChoices):
-        FEMALE = ('FEMALE', 'Female')
-        MALE = ('MALE', 'Male')
+        FEMALE = ('Female', 'Female')
+        MALE = ('Male', 'Male')
 
     class Marital_Status(models.TextChoices):
-        MARRIED = ('MARRIED', 'Married')
-        SINGLE = ('SINGLE', 'Single')
-        DIVORCED = ('DIVORCED', 'Divorces')
-        WIDOWED = ('WIDOWED', 'Widowed')
+        MARRIED = ('Married', 'Married')
+        SINGLE = ('Single', 'Single')
+        DIVORCED = ('Divorced', 'Divorced')
+        WIDOWED = ('Widowed', 'Widowed')
 
     class Tier(models.TextChoices):
-        ONE = ('ONE', '1')
-        TWO = ('TWO', '2')
-        THREE = ('THREE', '3')
+        ONE = ('1', '1')
+        TWO = ('2', '2')
+        THREE = ('3', '3')
+
+    class Board_Member(models.TextChoices):
+        YES = ('Yes', 'Yes')
+        NO = ('No', 'No')
 
     gender = models.CharField(
-        name='Gender',
+        name='gender',
         max_length=10,
         choices=Gender.choices,
         null=True,
@@ -156,7 +113,7 @@ class UserDetail(models.Model):
     )
 
     marital_status = models.CharField(
-        name='Marital Status',
+        name='marital_status',
         max_length=10,
         choices=Marital_Status.choices,
         null=True,
@@ -164,42 +121,67 @@ class UserDetail(models.Model):
     )
 
     tier = models.CharField(
-        name='Tier',
+        name='tier',
         max_length=10,
         choices=Tier.choices,
         null=True,
         blank=True
     )
 
-    usr = models.ForeignKey(
-        User,
-        verbose_name="Users",
-        on_delete=models.CASCADE)
-    image_file = models.ImageField(upload_to=None, height_field=None, width_field=None, max_length=100, null=False, default='default.jpg')
-    street_number = models.IntegerField()
-    street_name = models.CharField(max_length=50)
+    image_file = models.ImageField(
+        upload_to="images/",
+        height_field=None,
+        width_field=None,
+        max_length=125,
+        default='images/default.jpg'
+        )
+    street_number = models.IntegerField(blank=True,null=True)
+    street_name = models.CharField(max_length=50, blank=True,null=True)
     usr_city = models.ForeignKey(
         City,
         verbose_name="Cities",
+        blank=True,
+        null=True,
         on_delete=models.CASCADE
         )
     usr_state = models.ForeignKey(
         Usa_State,
+        blank=True,
+        null=True,
         verbose_name="Usa_States",
         on_delete=models.CASCADE
         )
-    postal_code = models.IntegerField()
+    postal_code = models.IntegerField(blank=True,null=True)
     birthdate = models.DateField(null=True, blank=True)
     assigned_elder = models.ForeignKey(
-        MinistryTeamMember,
-        verbose_name="MinistryTeamMembers",
+        MinistryRole,
+        verbose_name="MinistryRoles",
         on_delete=models.CASCADE,
         blank=True,
         null=True)
-    board_member = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name_plural = "UserDetails"
+    board_member = models.CharField(
+        name='board_member',
+        max_length=10,
+        choices=Board_Member.choices,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
-        return self.usr.first_name + ' ' + self.usr.last_name
+        return self.first_name + ' ' + self.last_name
+
+
+class Contact(models.Model):
+    fullname = models.CharField(max_length=75)
+    contact_email = models.EmailField()
+    contact_subject = models.CharField(max_length=50)
+    contact_message = models.TextField()
+    inserted_date = models.DateTimeField(
+        default=timezone.now
+    )
+
+    class Meta:
+        verbose_name_plural = "Catalog_Contacts"
+
+    def __str__(self):
+        return self.fullname

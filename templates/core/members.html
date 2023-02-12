@@ -1,0 +1,208 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% block title %}Members{% endblock %}
+{% block body %}
+<div class="page-content">
+    <div class="container-fluid">
+        <h1>Member List</h1>
+    </div>
+    <br />
+    <div class="row">
+        <div>
+            <canvas id="genderChart" class="reportChart"></canvas>
+        </div>
+        <div>
+            <canvas id="maritalChart" class="reportChart"></canvas>
+        </div>
+        <div>
+            <canvas id="cityChart" class="reportChart"></canvas>
+        </div>
+    </div>
+    <br />
+    <hr>
+    <div>
+        <table id="memTable" class="cell-border compact hover">
+            <thead class="thead-light">
+                <tr>
+                    <th class="fit">Last Name</th>
+                    <th class="fit">First Name</th>
+                    <th class="fit">Gender</th>
+                    <th class="fit">Marital Status</th>
+                    <th class="fit">Tier</th>
+                    <th class="fit">Street Number</th>
+                    <th class="fit">Street Name</th>
+                    <th class="fit">City</th>
+                    <th class="fit">State</th>
+                    <th class="fit">Postal Code</th>
+                    <th class="fit">Board Member?</th>
+                    <th class="fit"></th>
+                    <th class="fit"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in data_list %}
+                    <tr>
+                        <td class="fit">{{member.last_name}}</td>
+                        <td class="fit">{{member.first_name}}</td>
+                        <td class="fit">{{member.gender}}</td>
+                        <td class="fit">{{member.marital_status}}</td>
+                        <td class="fit">{{member.tier}}</td>
+                        <td class="fit">{{member.street_number}}</td>
+                        <td class="fit">{{member.street_name}}</td>
+                        <td class="fit">{{member.city}}</td>
+                        <td class="fit">{{member.state_abbrev}}</td>
+                        <td class="fit">{{member.postal_code}}</td>
+                        <td class="fit">{{member.board_member}}</td>
+                        <td><a href="#" class="btn btn-secondary btn-sm pull-right">Edit</a></td>
+                        <td class="fit">
+                            <form action="" method="POST">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="submit" value="Delete" class="btn btn-danger btn-sm">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-autocolors"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script>
+      const gender_ctx = document.getElementById("genderChart");
+      const myGenderChart = new Chart(gender_ctx, {
+          type: 'pie',
+          data: {
+              labels: {{ gender_labels|safe }},
+              datasets: [{
+                  data: {{ gender_data }},
+                  backgroundColor: [
+                      'rgba(255, 184, 255, 1)', // pink
+                      'rgba(0, 140, 255, 1)', // blue
+                      ],
+                  borderColor : [
+                      'rgba(255, 184, 255, 1)', // red
+                      'rgba(0, 140, 255, 1)', // blue
+                      ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: false,
+              maintainAspectRatio: true,
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'Gender Breakdown',
+                      position: 'top',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  datalabels: {
+                      color: ['black', 'black'],
+                      formatter: (value, context) => {
+                          const datapoints = context.dataset.data
+                          function totalSum(total, datapoint) {
+                              return total + datapoint;
+                          }
+                          const totalValue = datapoints.reduce(totalSum, 0);
+                          const percentageValue = (value/totalValue*100).toFixed(1);
+                          return `${percentageValue}%`;
+                      }
+                  },
+                  legend: {
+                      display: true,
+                      position: 'top'
+                  }
+              }
+          },
+          plugins: [ChartDataLabels]
+      });
+      const marital_ctx = document.getElementById("maritalChart");
+      const myMaritalChart = new Chart(marital_ctx, {
+          type: 'pie',
+          data: {
+              labels: {{ marital_labels|safe }},
+              datasets: [{
+                  data: {{ marital_data }},
+                  borderWidth: 0
+              }]
+          },
+          options: {
+              responsive: false,
+              maintainAspectRatio: true,
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'Marital Status Breakdown',
+                      position: 'top',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  datalabels: {
+                      color: ['black', 'black'],
+                      formatter: (value, context) => {
+                          const datapoints = context.dataset.data
+                          function totalSum(total, datapoint) {
+                              return total + datapoint;
+                          }
+                          const totalValue = datapoints.reduce(totalSum, 0);
+                          const percentageValue = (value/totalValue*100).toFixed(1);
+                          return `${percentageValue}%`;
+                      }
+                  },
+                  legend: {
+                      display: true,
+                      position: 'top'
+                  }
+              }
+          },
+          plugins: [ChartDataLabels]
+      });
+      const city_ctx = document.getElementById("cityChart");
+      const myCityChart = new Chart(city_ctx, {
+          type: 'pie',
+          data: {
+              labels: {{ city_labels|safe }},
+              datasets: [{
+                  data: {{ city_data|safe }},
+                  borderWidth: 0
+              }]
+          },
+          options: {
+              responsive: false,
+              maintainAspectRatio: true,
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'City Breakdown',
+                      position: 'top',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  datalabels: {
+                      color: ['black', 'black'],
+                      formatter: (value, context) => {
+                          const datapoints = context.dataset.data
+                          function totalSum(total, datapoint) {
+                              return total + datapoint;
+                          }
+                          const totalValue = datapoints.reduce(totalSum, 0);
+                          const percentageValue = (value/totalValue*100).toFixed(1);
+                          return `${percentageValue}%`;
+                      }
+                  },
+                  legend: {
+                      display: true,
+                      position: 'top'
+                  }
+              }
+          },
+          plugins: [ChartDataLabels]
+      });
+    </script>
+{% endblock %}

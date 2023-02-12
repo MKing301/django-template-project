@@ -1,5 +1,7 @@
 import os
+import pandas as pd
 
+from django.db import connection
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.forms import PasswordChangeForm
@@ -76,7 +78,6 @@ def entry(request):
     return render(request=request,
                   template_name="core/entry.html"
                   )
-
 
 
 def login_request(request):
@@ -271,7 +272,7 @@ def edit_profile(request):
                 request,
                 "Your profile was updated successfully."
             )
-            return redirect('core:view_profile')
+            return redirect('core:index')
 
     else:
         form = EditProfileForm(instance=request.user)
@@ -281,6 +282,92 @@ def edit_profile(request):
             template_name="core/edit_profile.html",
             context=args
         )
+
+
+@login_required
+def members(request):
+
+    gender_labels = []
+    gender_data = []
+    marital_labels = []
+    marital_data = []
+    city_labels = []
+    city_data = []
+
+    QUERY = """
+    select
+        cu.first_name,
+        cu.last_name,
+        cu.email,
+        cu.gender,
+        cu.marital_status,
+        cu.tier,
+        cu.street_number,
+        cu.street_name,
+        cc.name AS city,
+        cus.name AS state_abbrev,
+        cu.postal_code,
+        cu.birthdate,
+        cu.board_member
+    from core_user cu , core_city cc , core_usa_state cus
+    where cu.usr_city_id = cc.id
+    and cc.selected_state_id = cus.id;
+    """
+
+    data_list = []
+    with connection.cursor() as cur:
+        row = cur.execute(QUERY,)
+        for row in cur:
+            data_list.append({
+                'first_name': row[0],
+                'last_name': row[1],
+                'email': row[2],
+                'gender': row[3],
+                'marital_status': row[4],
+                'tier': row[5],
+                'street_number': row[6],
+                'street_name': row[7],
+                'city': row[8],
+                'state_abbrev': row[9],
+                'postal_code': row[10],
+                'birthdate': row[11],
+                'board_member': row[12]
+            })
+
+    gender_df = pd.DataFrame(list(data_list))
+    gender_group = gender_df.groupby(['gender'])['first_name'].count().reset_index(name='count')
+
+    for index, row in gender_group.iterrows():
+        gender_labels.append(row['gender'])
+        gender_data.append(row['count'])
+
+    marital_df = pd.DataFrame(list(data_list))
+    marital_group = marital_df.groupby(['marital_status'])['first_name'].count().reset_index(name='count')
+
+    for index, row in marital_group.iterrows():
+        marital_labels.append(row['marital_status'])
+        marital_data.append(row['count'])
+
+    city_df = pd.DataFrame(list(data_list))
+    city_group = city_df.groupby(['city'])['first_name'].count().reset_index(name='count')
+
+    for index, row in city_group.iterrows():
+        city_labels.append(row['city'])
+        city_data.append(row['count'])
+
+    return render(
+        request=request,
+        template_name="core/members.html",
+        context={
+            'data_list': data_list,
+            'gender_labels': gender_labels,
+            'gender_data': gender_data,
+            'marital_labels': marital_labels,
+            'marital_data': marital_data,
+            'city_labels': city_labels,
+            'city_data': city_data
+        }
+    )
 
 
 @login_required
