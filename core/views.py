@@ -293,6 +293,8 @@ def members(request):
     marital_data = []
     city_labels = []
     city_data = []
+    tier_labels = []
+    tier_data = []
 
     QUERY = """
     select
@@ -355,6 +357,13 @@ def members(request):
         city_labels.append(row['city'])
         city_data.append(row['count'])
 
+    tier_df = pd.DataFrame(list(data_list))
+    tier_group = tier_df.groupby(['tier'])['first_name'].count().reset_index(name='count')
+
+    for index, row in tier_group.iterrows():
+        tier_labels.append(row['tier'])
+        tier_data.append(row['count'])
+
     return render(
         request=request,
         template_name="core/members.html",
@@ -365,7 +374,9 @@ def members(request):
             'marital_labels': marital_labels,
             'marital_data': marital_data,
             'city_labels': city_labels,
-            'city_data': city_data
+            'city_data': city_data,
+            'tier_labels': tier_labels,
+            'tier_data': tierfire_data
         }
     )
 

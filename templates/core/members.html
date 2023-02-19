@@ -17,13 +17,17 @@
         <div>
             <canvas id="cityChart" class="reportChart"></canvas>
         </div>
+        <div>
+            <canvas id="tierChart" class="reportChart"></canvas>
+        </div>
     </div>
     <br />
     <hr>
     <div>
         <table id="memTable" class="cell-border compact hover">
-            <thead class="thead-light">
+            <thead>
                 <tr>
+                    <th class="fit">View</th>
                     <th class="fit">Last Name</th>
                     <th class="fit">First Name</th>
                     <th class="fit">Gender</th>
@@ -35,13 +39,12 @@
                     <th class="fit">State</th>
                     <th class="fit">Postal Code</th>
                     <th class="fit">Board Member?</th>
-                    <th class="fit"></th>
-                    <th class="fit"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for member in data_list %}
                     <tr>
+                        <td><a href="#"><i class="fa fa-eye" aria-hidden="true"></i></a></td>
                         <td class="fit">{{member.last_name}}</td>
                         <td class="fit">{{member.first_name}}</td>
                         <td class="fit">{{member.gender}}</td>
@@ -53,13 +56,6 @@
                         <td class="fit">{{member.state_abbrev}}</td>
                         <td class="fit">{{member.postal_code}}</td>
                         <td class="fit">{{member.board_member}}</td>
-                        <td><a href="#" class="btn btn-secondary btn-sm pull-right">Edit</a></td>
-                        <td class="fit">
-                            <form action="" method="POST">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <input type="submit" value="Delete" class="btn btn-danger btn-sm">
-                            </form>
-                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -103,18 +99,23 @@
                   datalabels: {
                       color: ['black', 'black'],
                       formatter: (value, context) => {
-                          const datapoints = context.dataset.data
-                          function totalSum(total, datapoint) {
-                              return total + datapoint;
-                          }
-                          const totalValue = datapoints.reduce(totalSum, 0);
-                          const percentageValue = (value/totalValue*100).toFixed(1);
-                          return `${percentageValue}%`;
+                        if(value > 0) {
+                            const datapoints = context.dataset.data
+                            function totalSum(total, datapoint) {
+                                return total + datapoint;
+                            }
+                            const totalValue = datapoints.reduce(totalSum, 0);
+                            const percentageValue = (value / totalValue * 100).toFixed(1);
+                            return `${percentageValue}%`;
+                        }else{
+                            value = "";
+                            return value;
+                        }
                       }
                   },
                   legend: {
                       display: true,
-                      position: 'top'
+                      position: 'right'
                   }
               }
           },
@@ -145,18 +146,23 @@
                   datalabels: {
                       color: ['black', 'black'],
                       formatter: (value, context) => {
-                          const datapoints = context.dataset.data
-                          function totalSum(total, datapoint) {
-                              return total + datapoint;
-                          }
-                          const totalValue = datapoints.reduce(totalSum, 0);
-                          const percentageValue = (value/totalValue*100).toFixed(1);
-                          return `${percentageValue}%`;
+                        if(value > 0) {
+                            const datapoints = context.dataset.data
+                            function totalSum(total, datapoint) {
+                                return total + datapoint;
+                            }
+                            const totalValue = datapoints.reduce(totalSum, 0);
+                            const percentageValue = (value / totalValue * 100).toFixed(1);
+                            return `${percentageValue}%`;
+                        }else{
+                            value = "";
+                            return value;
+                        }
                       }
                   },
                   legend: {
                       display: true,
-                      position: 'top'
+                      position: 'right'
                   }
               }
           },
@@ -187,18 +193,80 @@
                   datalabels: {
                       color: ['black', 'black'],
                       formatter: (value, context) => {
-                          const datapoints = context.dataset.data
-                          function totalSum(total, datapoint) {
-                              return total + datapoint;
-                          }
-                          const totalValue = datapoints.reduce(totalSum, 0);
-                          const percentageValue = (value/totalValue*100).toFixed(1);
-                          return `${percentageValue}%`;
+                        if(value > 0) {
+                            const datapoints = context.dataset.data
+                            function totalSum(total, datapoint) {
+                                return total + datapoint;
+                            }
+                            const totalValue = datapoints.reduce(totalSum, 0);
+                            const percentageValue = (value / totalValue * 100).toFixed(1);
+                            return `${percentageValue}%`;
+                        }else{
+                            value = "";
+                            return value;
+                        }
                       }
                   },
                   legend: {
                       display: true,
-                      position: 'top'
+                      position: 'right'
+                  }
+              }
+          },
+          plugins: [ChartDataLabels]
+      });
+      const tier_ctx = document.getElementById("tierChart");
+      const myTierChart = new Chart(tier_ctx, {
+          type: 'pie',
+          data: {
+              labels: {{ tier_labels|safe }},
+              datasets: [{
+                  data: {{ tier_data|safe }},
+                  backgroundColor: [
+                        'rgba(63, 195, 128, 1)', // green
+                        'rgba(240, 255, 0, 1)', // yellow
+                        'rgba(242, 38, 19, 1)', // red
+                      ],
+                  borderColor : [
+                        'rgba(63, 195, 128, 1)', // green
+                        'rgba(240, 255, 0, 1)', // yellow
+                        'rgba(242, 38, 19, 1)', // red
+                      ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: false,
+              maintainAspectRatio: true,
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'Tier Breakdown',
+                      position: 'top',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  datalabels: {
+                      color: ['black', 'black'],
+                      formatter: (value, context) => {
+                          if(value > 0) {
+                            const datapoints = context.dataset.data
+                            function totalSum(total, datapoint) {
+                                return total + datapoint;
+                            }
+                            const totalValue = datapoints.reduce(totalSum, 0);
+                            const percentageValue = (value / totalValue * 100).toFixed(1);
+                            return `${percentageValue}%`;
+                        }else{
+                            value = "";
+                            return value;
+                        }
+                      }
+                  },
+                  legend: {
+                      display: true,
+                      position: 'right'
                   }
               }
           },

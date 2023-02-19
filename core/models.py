@@ -74,7 +74,7 @@ class MinistryRole(models.Model):
         verbose_name_plural = "MinistryRoles"
 
     def __str__(self):
-        return self.name
+        return self.name + ' - ' + self.ministry_department.name
 
 
 class User(AbstractUser):
