@@ -376,7 +376,7 @@ def members(request):
             'city_labels': city_labels,
             'city_data': city_data,
             'tier_labels': tier_labels,
-            'tier_data': tierfire_data
+            'tier_data': tier_data
         }
     )
 
