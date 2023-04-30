@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
-    User,
-    Usa_State,
+    Profile,
+    Usr_State,
     City,
     Contact,
     Org,
@@ -9,8 +9,8 @@ from .models import (
     MinistryRole
     )
 
-admin.site.register(User)
-admin.site.register(Usa_State)
+admin.site.register(Profile)
+admin.site.register(Usr_State)
 admin.site.register(City)
 admin.site.register(Contact)
 admin.site.register(Org)

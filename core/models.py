@@ -1,13 +1,16 @@
+import uuid
+
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 from django.utils import timezone
+from PIL import Image
 
 
-class Usa_State(models.Model):
+class Usr_State(models.Model):
     name = models.CharField(max_length=75)
 
     class Meta:
-        verbose_name_plural = "Usa_States"
+        verbose_name_plural = "Usr_States"
 
     def __str__(self):
         return self.name
@@ -15,8 +18,8 @@ class Usa_State(models.Model):
 
 class City(models.Model):
     selected_state = models.ForeignKey(
-        Usa_State,
-        verbose_name="Usa_States",
+        Usr_State,
+        verbose_name="Usr_States",
         on_delete=models.CASCADE
         )
     name = models.CharField(max_length=75)
@@ -36,8 +39,8 @@ class Org(models.Model):
         on_delete=models.CASCADE
         )
     org_state = models.ForeignKey(
-        Usa_State,
-        verbose_name="Usa_States",
+        Usr_State,
+        verbose_name="Usr_States",
         on_delete=models.CASCADE
         )
 
@@ -77,7 +80,10 @@ class MinistryRole(models.Model):
         return self.name + ' - ' + self.ministry_department.name
 
 
-class User(AbstractUser):
+class Profile(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE) # Delete profile when user is deleted
+    uuid = models.UUIDField(primary_key=False, default=uuid.uuid4, editable=False)
 
     class Role(models.TextChoices):
         ADMIN = ('ADMIN', 'Admin')
@@ -99,10 +105,6 @@ class User(AbstractUser):
         ONE = ('1', '1')
         TWO = ('2', '2')
         THREE = ('3', '3')
-
-    class Board_Member(models.TextChoices):
-        YES = ('Yes', 'Yes')
-        NO = ('No', 'No')
 
     gender = models.CharField(
         name='gender',
@@ -127,14 +129,6 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
-
-    image_file = models.ImageField(
-        upload_to="images/",
-        height_field=None,
-        width_field=None,
-        max_length=125,
-        default='images/default.jpg'
-        )
     street_number = models.IntegerField(blank=True,null=True)
     street_name = models.CharField(max_length=50, blank=True,null=True)
     usr_city = models.ForeignKey(
@@ -145,30 +139,34 @@ class User(AbstractUser):
         on_delete=models.CASCADE
         )
     usr_state = models.ForeignKey(
-        Usa_State,
+        Usr_State,
         blank=True,
         null=True,
-        verbose_name="Usa_States",
+        verbose_name="Usr_States",
         on_delete=models.CASCADE
         )
     postal_code = models.IntegerField(blank=True,null=True)
-    birthdate = models.DateField(null=True, blank=True)
-    assigned_elder = models.ForeignKey(
-        MinistryRole,
-        verbose_name="MinistryRoles",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True)
-    board_member = models.CharField(
-        name='board_member',
-        max_length=10,
-        choices=Board_Member.choices,
-        null=True,
-        blank=True
-    )
+    image = models.ImageField(
+        upload_to="profile_pic",
+        default='default.png'
+        )
+
 
     def __str__(self):
-        return self.first_name + ' ' + self.last_name
+        return self.user.first_name + ' ' + self.user.last_name
+
+    # Override the save method of the model
+    def save(self, *args, **kwargs):
+        super(Profile, self).save(*args, **kwargs)
+
+        img = Image.open(self.image.path) # Open image
+        print(self.image.path)
+
+        # resize image
+        if img.height > 150 or img.width > 150:
+            output_size = (150, 150)
+            img.thumbnail(output_size) # Resize image
+            img.save(self.image.path) # Save it again and override the larger image
 
 
 class Contact(models.Model):

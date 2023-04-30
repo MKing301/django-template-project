@@ -1,0 +1,149 @@
+{% extends 'core/layout.html' %}
+{% block title %} Edit Profile {% endblock %}
+{% block body %}
+<div class="page-content">
+  <div class="container-fluid">
+    <div class="media">
+      <img
+        class="account-img"
+        src="{{ user.profile.image.url }}"
+      />
+      <div class="media-body">
+      </div>
+    </div>
+    <br>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Profile Info</legend>
+        <div class="form-group">
+          <label for="current_image">Current Image:  </label>
+          <a id="current_image" href="/media/{{ user.profile.image }}">{{ user.profile.image }}</a>
+        </div>
+        <div class="form-group">
+          <label>Change:  </label>
+          <input type="file" name="image" accept="image/" id="id_image">
+        </div>
+        <br>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-sm-3">
+              <label for="id_first_name">First Name</label>
+              <input type="text" class="form-control form-control-sm" name="first_name" value="{{ user.first_name }}" required id="id_first_name" readonly="true">
+            </div>
+            <div class="col-sm-3">
+              <label for="id_last_name">Last Name</label>
+              <input type="text" class="form-control form-control-sm" name="last_name" value="{{ user.last_name }}" required id="id_last_name">
+            </div>
+            <div class="col-sm-3">
+              <label for="id_username">Username</label>
+              <input type="text" class="form-control form-control-sm" name="username" value="{{ user.username }}" required id="id_username" readonly="true">
+            </div>
+            <div class="col-sm-3">
+              <label for="id_email">Email</label>
+              <input type="text" class="form-control form-control-sm" name="email" value="{{ user.email }}" required id="id_email">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-3">
+              <label for="id_gender">Gender:</label>
+              <select class="form-control form-control-sm" name="gender" id="id_gender">
+                <option
+                    selected="true"
+                    value='{{ prfle.gender }}'
+                  >
+                    {{ prfle.gender }}
+                  </option>
+                  {% if prfle.gender == "Female" %}
+                    <option value="Male">Male</option>
+                  {% else %}
+                    <option value="Female">Female</option>
+                  {% endif %}
+              </select>
+            </div>
+            <div class="col-sm-3">
+              <label for="id_marital_status">Marital status:</label>
+              <select class="form-control form-control-sm" name="marital_status" id="id_marital_status">
+                <option
+                    selected="true"
+                    value='{{ prfle.marital_status }}'
+                  >
+                    {{ prfle.marital_status }}
+                </option>
+                {% if prfle.marital_status == "Married" %}
+                  <option value="Single">Single</option>
+                  <option value="Divorced">Divorced</option>
+                  <option value="Widowed">Widowed</option>
+                {% elif prfle.marital_status == "Single" %}
+                  <option value="Married">Married</option>
+                  <option value="Divorced">Divorced</option>
+                  <option value="Widowed">Widowed</option>
+                {% elif prfle.marital_status == "Divorced" %}
+                  <option value="Married">Married</option>
+                  <option value="Single">Single</option>
+                  <option value="Widowed">Widowed</option>
+                {% else %}
+                  <option value="Married">Married</option>
+                  <option value="Single">Single</option>
+                  <option value="Divorced">Divorced</option>
+                {% endif %}
+              </select>
+            </div>
+            <div class="col-sm-3">
+              <label for="id_street_number">Street number:</label>
+              <input class="form-control form-control-sm" type="number" name="street_number" value="302" id="id_street_number">
+            </div>
+            <div class="col-sm-3">
+              <label for="id_street_name">Street name:</label>
+              <input class="form-control form-control-sm" type="text" name="street_name" value="Alamosa Pl" maxlength="50" id="id_street_name">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-3">
+              <label for="id_usr_city">Cities:</label>
+              <select class="form-control form-control-sm" name="usr_city" id="id_usr_city">
+                <option
+                    selected="true"
+                    value='{{ prfle.usr_city_id }}'
+                  >
+                    {{ prfle.usr_city }}
+                  </option>
+                  {% for c in city_list %}
+                    <option value="{{ c.id }}">
+                      {{ c.name }}
+                    </option>
+                  {% endfor %}
+              </select>
+            </div>
+            <div class="col-sm-3">
+              <label for="id_usr_state">States:</label>
+              <select class="form-control form-control-sm" name="usr_state" id="id_usr_state">
+                <option
+                    selected="true"
+                    value='{{ prfle.usr_state_id }}'
+                  >
+                    {{ prfle.usr_state }}
+                  </option>
+                  {% for s in state_list %}
+                    <option value="{{ s.id }}">
+                      {{ s.name }}
+                    </option>
+                  {% endfor %}
+              </select>
+            </div>
+            <div class="col-sm-3">
+              <label for="id_postal_code">Postal Code:</label>
+              <input class="form-control form-control-sm" type="number" name="postal_code" id="id_postal_code" value="{{ prfle.postal_code }}">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-3">
+              <button class="btn btn-sm btn-outline-info" type="submit">Update</button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+{% endblock %}

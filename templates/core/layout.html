@@ -47,12 +47,7 @@
 
     <!-- Data Tables -->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.2/css/dataTables.bootstrap4.min.css">
-
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.2/js/dataTables.bootstrap4.min.js"></script>
 
 
   <title>
@@ -84,12 +79,23 @@
           $('#memTable').DataTable({
             'columnDefs': [
               {
-                  "targets":[0,3,4,5,6, 9, 10, 11],
+                  "targets":[0,3,4,5,6, 9, 10],
                   "className": "text-center"
             }
           ]
           });
       } );
+
+      $(document).ready( function () {
+        $('#financeTable').DataTable({
+          'columnDefs': [
+            {
+                "targets":["_all"],
+                "className": "text-center"
+          }
+        ]
+        });
+    } );
     </script>
 
   </body>

@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.forms import (
     AuthenticationForm, UserCreationForm, UserChangeForm
 )
-from .models import Contact, User
+from django.contrib.auth.models import User
+from .models import Profile, Contact
 from django.core.exceptions import ValidationError
 from captcha.fields import ReCaptchaField
 from core.tasks import send_registration_email_task
@@ -50,26 +51,30 @@ class NewUserForm(UserCreationForm):
             return user
 
 
-class EditProfileForm(UserChangeForm):
+# Create a UserUpdateForm to update a username and email
+class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField()
 
     class Meta:
         model = User
-        fields = (
-            'first_name',
-            'last_name',
-            'password',
-            'email'
-        )
+        fields = ['username', 'email']
 
-    def save(self, commit=True):
-        user = super(EditProfileForm, self).save(commit=False)
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        user.password = self.cleaned_data['password']
-        user.email = self.cleaned_data['email']
-        if commit:
-            user.save()
-            return user
+
+
+class ProfileUpdateForm(forms.ModelForm):
+
+    class Meta:
+        model = Profile
+        fields = (
+            'image',
+            'gender',
+            'marital_status',
+            'street_number',
+            'street_name',
+            'usr_city',
+            'usr_state',
+            'postal_code'
+        )
 
 
 class ContactForm(forms.ModelForm):

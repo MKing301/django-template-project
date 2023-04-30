@@ -34,7 +34,18 @@ INSTALLED_APPS = [
     'core',
     'widget_tweaks',
     'captcha',
+    #'django_nose',
 ]
+
+# Use nose to run all tests
+#TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+''' NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=core',
+] '''
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -86,7 +97,6 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-AUTH_USER_MODEL = 'core.User'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -16,7 +16,7 @@ urlpatterns = [
     path("accounts/logout/", views.logout_request, name="logout_request"),
     path("accounts/login/", views.login_request, name="login_request"),
     path("register/", views.register, name="register"),
-    path("profile/edit/", views.edit_profile, name="edit_profile"),
+    path("profile/", views.profile, name="profile"),
     path(
         "profile/password/",
         PasswordsChangeView.as_view(
@@ -56,6 +56,7 @@ urlpatterns = [
         name='password_reset_complete'),
     path("contact/", views.contact, name='contact'),
     path("members/", views.members, name='members'),
+    path("finances/", views.finances, name='finances'),
 ]
 
 htmx_urlpatterns = [

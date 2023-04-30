@@ -1,5 +1,8 @@
 import os
 import pandas as pd
+import openpyxl
+import json
+import datetime
 
 from django.db import connection
 from django.shortcuts import render, redirect
@@ -11,11 +14,12 @@ from django.contrib.auth import (
 )
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import User
+from .models import User, City, Usr_State, Profile
 from .forms import (
     AuthenticationFormWithCaptchaField,
     NewUserForm,
-    EditProfileForm,
+    UserUpdateForm,
+    ProfileUpdateForm,
     ContactForm
 )
 from django.core.mail import EmailMultiAlternatives
@@ -262,26 +266,43 @@ def contact(request):
 
 
 @login_required
-def edit_profile(request):
-    if request.method == 'POST':
-        form = EditProfileForm(request.POST, instance=request.user)
+def profile(request):
 
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request,
-                "Your profile was updated successfully."
-            )
-            return redirect('core:index')
+    usr = User.objects.get(id=request.user.id)
+    prfle = Profile.objects.get(user_id=request.user.id)
+
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=usr)
+        p_form = ProfileUpdateForm(request.POST,
+                                   request.FILES,
+                                   instance=prfle)
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('core:profile') # Redirect back to profile page
 
     else:
-        form = EditProfileForm(instance=request.user)
-        args = {'form': form}
-        return render(
-            request=request,
-            template_name="core/edit_profile.html",
-            context=args
-        )
+        u_form = UserUpdateForm(instance=usr)
+        p_form = ProfileUpdateForm(instance=prfle)
+
+    city_list = City.objects.all()
+    state_list = Usr_State.objects.all()
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form,
+        'usr': usr,
+        'prfle': prfle,
+        'city_list': city_list,
+        'state_list': state_list
+    }
+
+    return render(
+        request,
+        'core/profile.html',
+        context
+    )
 
 
 @login_required
@@ -297,23 +318,24 @@ def members(request):
     tier_data = []
 
     QUERY = """
-    select
-        cu.first_name,
-        cu.last_name,
-        cu.email,
-        cu.gender,
-        cu.marital_status,
-        cu.tier,
-        cu.street_number,
-        cu.street_name,
-        cc.name AS city,
-        cus.name AS state_abbrev,
-        cu.postal_code,
-        cu.birthdate,
-        cu.board_member
-    from core_user cu , core_city cc , core_usa_state cus
-    where cu.usr_city_id = cc.id
-    and cc.selected_state_id = cus.id;
+    SELECT
+	au.id,
+	au.first_name,
+	au.last_name,
+	au.email,
+	cp.gender,
+	cp.marital_status,
+	cp.tier,
+	cp.street_number,
+	cp.street_name,
+	cc.name,
+	cus.name,
+	cp.postal_code
+    FROM auth_user au, core_profile cp, core_city cc, core_usr_state cus
+    WHERE au.id = cp.user_id
+    and cp.usr_city_id = cc.id
+    and cus.id = cc.selected_state_id
+    ORDER BY au.last_name, au.first_name
     """
 
     data_list = []
@@ -321,19 +343,18 @@ def members(request):
         row = cur.execute(QUERY,)
         for row in cur:
             data_list.append({
-                'first_name': row[0],
-                'last_name': row[1],
-                'email': row[2],
-                'gender': row[3],
-                'marital_status': row[4],
-                'tier': row[5],
-                'street_number': row[6],
-                'street_name': row[7],
-                'city': row[8],
-                'state_abbrev': row[9],
-                'postal_code': row[10],
-                'birthdate': row[11],
-                'board_member': row[12]
+                'id': row[0],
+                'first_name': row[1],
+                'last_name': row[2],
+                'email': row[3],
+                'gender': row[4],
+                'marital_status': row[5],
+                'tier': row[6],
+                'street_number': row[7],
+                'street_name': row[8],
+                'city': row[9],
+                'state_abbrev': row[10],
+                'postal_code': row[11],
             })
 
     gender_df = pd.DataFrame(list(data_list))
@@ -377,6 +398,74 @@ def members(request):
             'city_data': city_data,
             'tier_labels': tier_labels,
             'tier_data': tier_data
+        }
+    )
+
+
+@login_required
+def finances(request):
+    num_tithe_donors = []
+    tithe_amount = []
+    num_church_budget_donors = []
+    church_budget_amount = []
+    month_year = []
+    total_local_funds_amount = []
+
+    wb = openpyxl.load_workbook('/home/mfsd1809/dev-environment/FullStackWebDeveloper/Gethsemane/report.xlsx')
+    for sheet in wb.worksheets:
+        month_year.append(sheet.title.replace(',', ''))
+        for row in range(1, sheet.max_row + 1):
+            if sheet['A' + str(row)].value == 'Tithe':
+                num_tithe_donors.append(sheet['B' + str(row)].value)
+                tithe_amount.append(sheet['D' + str(row)].value)
+            if sheet['A' + str(row)].value == 'Church Budget':
+                num_church_budget_donors.append(sheet['B' + str(row)].value)
+                church_budget_amount.append(sheet['D' + str(row)].value)
+            if sheet['A' + str(row)].value == 'Local Funds':
+                total_local_funds_amount.append(sheet['D' + str(row)].value)
+            else:
+                pass
+
+    # Reverse lists for oldest to newest values
+    num_tithe_donors.reverse()
+    tithe_amount.reverse()
+    num_church_budget_donors.reverse()
+    church_budget_amount.reverse()
+    month_year.reverse()
+    total_local_funds_amount.reverse()
+
+
+
+    # Create a zipped list of tuples from above lists
+    zippedList =  list(zip(month_year, num_tithe_donors, tithe_amount, num_church_budget_donors, church_budget_amount, total_local_funds_amount))
+
+    # Create a dataframe from zipped list
+    df = pd.DataFrame(zippedList, columns = [
+        'month_year' ,
+        'number_tithe_donors',
+        'tithe',
+        'number_church_budget_donors',
+        'church_budget',
+        'total_local_funds'])
+
+    # Set index to start at 1; 0 is the default
+    df.index = df.index + 1
+
+    labels = df['month_year'].values.tolist()
+    values = df['church_budget'].values.tolist()
+
+    # parsing the DataFrame in json format.
+    json_records = df.reset_index().to_json(orient ='records')
+    data = []
+    data = json.loads(json_records)
+
+    return render(
+        request=request,
+        template_name="core/finances.html",
+        context={
+            'data': data,
+            'labels': labels,
+            'values': values
         }
     )
 
