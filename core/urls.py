@@ -57,6 +57,7 @@ urlpatterns = [
     path("contact/", views.contact, name='contact'),
     path("members/", views.members, name='members'),
     path("finances/", views.finances, name='finances'),
+    path("calendar/", views.calendar, name='calendar'),
 ]
 
 htmx_urlpatterns = [
