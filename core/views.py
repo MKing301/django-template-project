@@ -470,6 +470,16 @@ def finances(request):
     )
 
 
+
+@login_required
+def calendar(request):
+    
+    return render(
+        request=request,
+        template_name="core/calendar.html",
+    )
+
+
 @login_required
 def logout_request(request):
     return logout_then_login(request, login_url='/')
