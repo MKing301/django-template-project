@@ -1,0 +1,11 @@
+{% extends 'core/layout.html' %}
+{% block title %} Calender {% endblock %}
+{% load static %}
+{% block body %}
+{% load widget_tweaks %}
+<div class="page-content">
+    <legend class="border-bottom mb-4">
+        Calender
+    </legend>
+    <iframe  class="responsive-iframe"  src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=America%2FChicago&showNav=0&showTitle=0&showDate=0&showPrint=0&src=bGhib2UyMDEzQGdtYWlsLmNvbQ&src=ZW4udXNhI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23039BE5&color=%23009688" style="border:solid 1px #777" width="1280" height="720" frameborder="0" scrolling="no"></iframe>
+{% endblock %}
