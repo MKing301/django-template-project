@@ -1,5 +1,7 @@
 import os
+import logging
 
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from dotenv import load_dotenv
 from django.contrib.messages import constants as messages
@@ -168,3 +170,35 @@ CELERY_BROKER_URL = "amqp://guest:guest@localhost:5672//"
 CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 CELERY_ENABLE_UTC = False
 CELERY_TIMEZONE = 'America/New_York'
+
+LOGGING = {
+    'version': 1,
+    # Version of logging
+    'disable_existing_loggers': False,
+    'formatters':{
+        'file':{
+            'format': '[%(asctime)s] - (%(levelname)s) - {%(name)s} - %(message)s',
+        }
+    },
+
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'template.log'),
+            'maxBytes': 10*1024*1024,
+            'backupCount': 5,
+            'formatter': 'file',
+        },
+
+    },
+
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True
+        },
+    },
+}
+
