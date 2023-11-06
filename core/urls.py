@@ -55,7 +55,9 @@ urlpatterns = [
         ),
         name='password_reset_complete'),
     path("contact/", views.contact, name='contact'),
+    path("member_stats/", views.member_stats, name='member_stats'),
     path("members/", views.members, name='members'),
+    path("finance_chart/", views.finance_chart, name='finance_chart'),
     path("finances/", views.finances, name='finances'),
     path("calendar/", views.calendar, name='calendar'),
 ]

@@ -31,15 +31,43 @@
             <li class="nav-item">
               <a class="nav-link" href="{% url 'core:calendar' %}">Calendar</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'core:members' %}">Members</a>
+            <li class="nav-item dropdown">
+                <a 
+                    class="nav-link dropdown-toggle" 
+                    href="#"
+                    id="memberNavbarDropdown"
+                    role="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                >
+                        Member
+              </a>
+                <div class="dropdown-menu" aria-labelledby="memberNavbarDropdown">
+                    <a class="dropdown-item" href="{% url 'core:member_stats' %}">Stats</a>
+                    <a class="dropdown-item" href="{% url 'core:members' %}">List</a>
+                </div>
             </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'core:profile' %}">Profile</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'core:finances' %}">Finance</a>
-              </li>
+            <li class="nav-item dropdown">
+                <a 
+                    class="nav-link dropdown-toggle" 
+                    href="#"
+                    id="financeNavbarDropdown"
+                    role="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                >
+                        Finance
+            </a>
+                <div class="dropdown-menu" aria-labelledby="financeNavbarDropdown">
+                    <a class="dropdown-item" href="{% url 'core:finance_chart' %}">Chart</a>
+                    <a class="dropdown-item" href="{% url 'core:finances' %}">Table</a>
+                </div>
+            </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'core:logout_request' %}">Logout</a>
               </li>

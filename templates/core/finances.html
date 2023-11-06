@@ -1,14 +1,9 @@
 {% extends 'core/layout.html' %}
 {% load static %}
-{% block title %}Members{% endblock %}
+{% block title %}Budget{% endblock %}
 {% block body %}
 <div class="page-content">
     <div class="container-fluid">
-        <div class="row">
-            <div>
-                <canvas id="financeChart"></canvas>
-            </div>
-        </div>
         <table id="financeTable" class="cell-border compact hover">
             <thead>
                 <tr>
@@ -35,34 +30,4 @@
         </table>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-autocolors"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-  <script src="https://unpkg.com/chart.js-plugin-labels-dv/dist/chartjs-plugin-labels.min.js"></script>
-  <script>
-      const ctx = document.getElementById("financeChart");
-      const myFinanceChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: {{labels|safe}},
-          datasets: [{
-            data: {{values|safe}}
-          }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: "Church Budget",
-                    font: {
-                        size: 20
-                    }
-                }
-            }
-        }
-      });
-    </script>
 {% endblock %}

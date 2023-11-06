@@ -1,0 +1,250 @@
+{% extends 'core/layout.html' %}
+{% load static %}
+{% block title %}Member Stats{% endblock %}
+{% block body %}
+<div class="page-content">
+    <div class="container-fluid">
+        <h1>Membership Statistics</h1>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-4">
+            <canvas id="genderChart"></canvas>
+        </div>
+        <div class="col-sm-4">
+            <canvas id="tierChart"></canvas>
+        </div>
+        <div class="col-sm-4">
+            <canvas id="maritalChart"></canvas>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        <div id="cityChartId" class="col-sm-12">
+            <canvas id="cityChart"></canvas>
+        </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="text/javascript" src="chartjs-plugin-colorschemes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-autocolors"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script src="https://unpkg.com/chart.js-plugin-labels-dv/dist/chartjs-plugin-labels.min.js"></script>
+  <script>
+      const gender_ctx = document.getElementById("genderChart");
+      const myGenderChart = new Chart(gender_ctx, {
+          type: 'pie',
+          data: {
+              labels: {{ gender_labels|safe }},
+              datasets: [{
+                  data: {{ gender_data }},
+                  backgroundColor: [
+                      'rgba(255, 184, 255, 1)', // pink
+                      'rgba(0, 140, 255, 1)', // blue
+                      ],
+                  borderColor : [
+                      'rgba(255, 184, 255, 1)', // red
+                      'rgba(0, 140, 255, 1)', // blue
+                      ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'Gender Breakdown',
+                      position: 'top',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  datalabels: {
+                      color: ['black', 'black'],
+                      //formatter: (value, context) => {
+                      //  if(value > 0) {
+                      //      const datapoints = context.dataset.data
+                      //      function totalSum(total, datapoint) {
+                      //          return total + datapoint;
+                      //      }
+                      //      const totalValue = datapoints.reduce(totalSum, 0);
+                      //      const percentageValue = (value / totalValue * 100).toFixed(1);
+                      //      return `${percentageValue}%`;
+                      //  }else{
+                      //      value = "";
+                      //      return value;
+                      //  }
+                      //}
+                  },
+                  legend: {
+                      display: false,
+                      position: 'right'
+                  }
+              }
+          },
+          plugins: [ChartDataLabels]
+      });
+      const tier_ctx = document.getElementById("tierChart");
+      const myTierChart = new Chart(tier_ctx, {
+          type: 'pie',
+          data: {
+              labels: {{ tier_labels|safe }},
+              datasets: [{
+                  data: {{ tier_data|safe }},
+                  backgroundColor: [
+                        'rgba(63, 195, 128, 1)', // green
+                        'rgba(240, 255, 0, 1)', // yellow
+                        'rgba(242, 38, 19, 1)', // red
+                      ],
+                  borderColor : [
+                        'rgba(63, 195, 128, 1)', // green
+                        'rgba(240, 255, 0, 1)', // yellow
+                        'rgba(242, 38, 19, 1)', // red
+                      ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'Tier Breakdown',
+                      position: 'top',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  datalabels: {
+                      //color: ['black', 'black'],
+                      //formatter: (value, context) => {
+                      //    if(value > 0) {
+                      //      const datapoints = context.dataset.data
+                      //      function totalSum(total, datapoint) {
+                      //          return total + datapoint;
+                      //     }
+                      //      const totalValue = datapoints.reduce(totalSum, 0);
+                      //      const percentageValue = (value / totalValue * 100).toFixed(1);
+                      //      return `${percentageValue}%`;
+                      //  }else{
+                      //      value = "";
+                      //      return value;
+                      //  }
+                     // }
+                  },
+                  legend: {
+                      display: false,
+                      position: 'right'
+                  }
+              }
+          },
+          plugins: [ChartDataLabels]
+      });
+      const marital_ctx = document.getElementById("maritalChart");
+      const myMaritalChart = new Chart(marital_ctx, {
+          type: 'bar',
+          data: {
+              labels: {{ marital_labels|safe }},
+              datasets: [{
+                  backgroundColor: ["tan", "orange", "silver", "coral"],
+                  data: {{ marital_data }},
+                  borderWidth: 0
+              }]
+          },
+          options: {
+                    responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'Marital Status Breakdown',
+                      position: 'top',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  datalabels: {
+                      color: ['black', 'black'],
+                      //formatter: (value, context) => {
+                      //  if(value > 0) {
+                      //      const datapoints = context.dataset.data
+                      //     function totalSum(total, datapoint) {
+                      //          return total + datapoint;
+                      //      }
+                      //      const totalValue = datapoints.reduce(totalSum, 0);
+                      //      const percentageValue = (value / totalValue * 100).toFixed(1);
+                      //      return `${percentageValue}%`;
+                      //  }else{
+                      //      value = "";
+                      //      return value;
+                      //  }
+                      //}
+                  },
+                  legend: {
+                      display: false,
+                      position: 'right'
+                  }
+              }
+          },
+          plugins: [ChartDataLabels]
+      });
+      const city_ctx = document.getElementById("cityChart");
+      const myCityChart = new Chart(city_ctx, {
+          type: 'bar',
+          data: {
+              labels: {{ city_labels|safe }},
+              datasets: [{
+                  backgroundColor: [
+                    "#d425a7", "#54e2c1", "#fb553f", "#9f8abc", "#8ebe0b",
+                    "#54c651", "#eb8268", "#f41515", "#748e7d", "#53827e",
+                    "#b5eb21", "#128347", "#fcdb2c", "#6bbd1a", "#e1da91",
+                    "#31c9dd", "#3a49c7", "#6b1e44", "#0db988", "#f009f5",
+                    "#d1f23e"
+                    ],
+                  data: {{ city_data|safe }},
+                  borderWidth: 0
+              }]
+          },
+          options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                  title: {
+                      display: true,
+                      text: 'City Breakdown',
+                      position: 'top',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  datalabels: {
+                      color: ['black', 'black'],
+                      //formatter: (value, context) => {
+                      //  if(value > 0) {
+                      //      const datapoints = context.dataset.data
+                      //      function totalSum(total, datapoint) {
+                      //          return total + datapoint;
+                      //      }
+                      //      const totalValue = datapoints.reduce(totalSum, 0);
+                      //      const percentageValue = (value / totalValue * 100).toFixed(1);
+                      //      return `${percentageValue}%`;
+                      //  }else{
+                      //      value = "";
+                      //      return value;
+                      //  }
+                      //}
+                  },
+                  legend: {
+                      display: false,
+                      position: 'right'
+                  }
+              }
+          },
+          plugins: [ChartDataLabels]
+      });
+    </script>
+{% endblock %}

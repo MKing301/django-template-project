@@ -306,6 +306,101 @@ def profile(request):
 
 
 @login_required
+def member_stats(request):
+
+    gender_labels = []
+    gender_data = []
+    marital_labels = []
+    marital_data = []
+    city_labels = []
+    city_data = []
+    tier_labels = []
+    tier_data = []
+
+    QUERY = """
+    SELECT
+	au.id,
+	au.first_name,
+	au.last_name,
+	au.email,
+	cp.gender,
+	cp.marital_status,
+	cp.tier,
+	cp.street_number,
+	cp.street_name,
+	cc.name,
+	cus.name,
+	cp.postal_code
+    FROM auth_user au, core_profile cp, core_city cc, core_usr_state cus
+    WHERE au.id = cp.user_id
+    and cp.usr_city_id = cc.id
+    and cus.id = cc.selected_state_id
+    ORDER BY au.last_name, au.first_name
+    """
+
+    data_list = []
+    with connection.cursor() as cur:
+        row = cur.execute(QUERY,)
+        for row in cur:
+            data_list.append({
+                'id': row[0],
+                'first_name': row[1],
+                'last_name': row[2],
+                'email': row[3],
+                'gender': row[4],
+                'marital_status': row[5],
+                'tier': row[6],
+                'street_number': row[7],
+                'street_name': row[8],
+                'city': row[9],
+                'state_abbrev': row[10],
+                'postal_code': row[11],
+            })
+
+    gender_df = pd.DataFrame(list(data_list))
+    gender_group = gender_df.groupby(['gender'])['first_name'].count().reset_index(name='count')
+
+    for index, row in gender_group.iterrows():
+        gender_labels.append(row['gender'])
+        gender_data.append(row['count'])
+
+    marital_df = pd.DataFrame(list(data_list))
+    marital_group = marital_df.groupby(['marital_status'])['first_name'].count().reset_index(name='count')
+
+    for index, row in marital_group.iterrows():
+        marital_labels.append(row['marital_status'])
+        marital_data.append(row['count'])
+
+    city_df = pd.DataFrame(list(data_list))
+    city_group = city_df.groupby(['city'])['first_name'].count().reset_index(name='count')
+
+    for index, row in city_group.iterrows():
+        city_labels.append(row['city'])
+        city_data.append(row['count'])
+
+    tier_df = pd.DataFrame(list(data_list))
+    tier_group = tier_df.groupby(['tier'])['first_name'].count().reset_index(name='count')
+
+    for index, row in tier_group.iterrows():
+        tier_labels.append(row['tier'])
+        tier_data.append(row['count'])
+
+    return render(
+        request=request,
+        template_name="core/member_stats.html",
+        context={
+            'data_list': data_list,
+            'gender_labels': gender_labels,
+            'gender_data': gender_data,
+            'marital_labels': marital_labels,
+            'marital_data': marital_data,
+            'city_labels': city_labels,
+            'city_data': city_data,
+            'tier_labels': tier_labels,
+            'tier_data': tier_data
+        }
+    )
+@login_required
 def members(request):
 
     gender_labels = []
@@ -401,6 +496,73 @@ def members(request):
         }
     )
 
+
+@login_required
+def finance_chart(request):
+    num_tithe_donors = []
+    tithe_amount = []
+    num_church_budget_donors = []
+    church_budget_amount = []
+    month_year = []
+    total_local_funds_amount = []
+
+    wb = openpyxl.load_workbook('/home/mfsd1809/dev-environment/FullStackWebDeveloper/Gethsemane/report.xlsx')
+    for sheet in wb.worksheets:
+        month_year.append(sheet.title.replace(',', ''))
+        for row in range(1, sheet.max_row + 1):
+            if sheet['A' + str(row)].value == 'Tithe':
+                num_tithe_donors.append(sheet['B' + str(row)].value)
+                tithe_amount.append(sheet['D' + str(row)].value)
+            if sheet['A' + str(row)].value == 'Church Budget':
+                num_church_budget_donors.append(sheet['B' + str(row)].value)
+                church_budget_amount.append(sheet['D' + str(row)].value)
+            if sheet['A' + str(row)].value == 'Local Funds':
+                total_local_funds_amount.append(sheet['D' + str(row)].value)
+            else:
+                pass
+
+    # Reverse lists for oldest to newest values
+    num_tithe_donors.reverse()
+    tithe_amount.reverse()
+    num_church_budget_donors.reverse()
+    church_budget_amount.reverse()
+    month_year.reverse()
+    total_local_funds_amount.reverse()
+
+
+
+    # Create a zipped list of tuples from above lists
+    zippedList =  list(zip(month_year, num_tithe_donors, tithe_amount, num_church_budget_donors, church_budget_amount, total_local_funds_amount))
+
+    # Create a dataframe from zipped list
+    df = pd.DataFrame(zippedList, columns = [
+        'month_year' ,
+        'number_tithe_donors',
+        'tithe',
+        'number_church_budget_donors',
+        'church_budget',
+        'total_local_funds'])
+
+    # Set index to start at 1; 0 is the default
+    df.index = df.index + 1
+
+    labels = df['month_year'].values.tolist()
+    values = df['church_budget'].values.tolist()
+
+    # parsing the DataFrame in json format.
+    json_records = df.reset_index().to_json(orient ='records')
+    data = []
+    data = json.loads(json_records)
+
+    return render(
+        request=request,
+        template_name="core/finance_chart.html",
+        context={
+            'data': data,
+            'labels': labels,
+            'values': values
+        }
+    )
 
 @login_required
 def finances(request):
