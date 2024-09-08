@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +9,10 @@
     />
     <meta name="description" content="" />
     <meta name="author" content="" />
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}"/>
+
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -32,7 +37,7 @@
     ></script>
 
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    
+
 
     {% load static %}
     <!-- Custom CSS -->
